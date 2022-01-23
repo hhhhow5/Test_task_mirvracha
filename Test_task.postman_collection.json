@@ -1,0 +1,406 @@
+{
+	"info": {
+		"_postman_id": "664711b9-b952-4424-8d00-a22b977759d7",
+		"name": "Test_task",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "POST",
+			"item": [
+				{
+					"name": "PreRegTestTrue",
+					"item": [
+						{
+							"name": "auth/contReg",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let random = +new Date();\r",
+											"\r",
+											"pm.globals.set(\"email\", `${random}-user@test.com`);"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Confirmed email was successful. Code is: \" + pm.response.code, function () {\r",
+											"pm.expect(pm.response.code).to.be.oneOf([200,201,202])\r",
+											"});\r",
+											"\r",
+											" const jsonData = pm.response.json();\r",
+											"\r",
+											"\r",
+											"pm.test(\"Generate new email\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.environment.set(\"gen_email\", jsonData.user.email);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"email matches \" + jsonData.user.email, function () {\r",
+											"    pm.expect(pm.response.text(jsonData.user.email)).to.include(\"user@test.com\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Email is not null \" + jsonData.user.email, function () {\r",
+											"    pm.expect(jsonData.user.email).to.be.not.null;\r",
+											"})\r",
+											"\r",
+											"pm.test(\"Id matches \" + jsonData.user.role.id, function () {\r",
+											"    pm.expect(jsonData.user.role.id).to.eql(2);\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Referer",
+										"value": "https://test.mirvracha.ru/",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"roleId\": \"4\",\r\n    \"url\": \"patient\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{mir_url}}/continueRegistration",
+									"host": [
+										"{{mir_url}}"
+									],
+									"path": [
+										"continueRegistration"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "RegWithTrueTest",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let random = +new Date();\r",
+											"\r",
+											"pm.globals.set(\"lastName\", `${random}-Иванов`);\r",
+											"pm.globals.set(\"firstName\", `${random}-Ваня`);\r",
+											"pm.globals.set(\"middleName\", `${random}-Иванович`);"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"User creation was successful. Code is: \" + pm.response.code, function () {\r",
+											"pm.expect(pm.response.code).to.be.oneOf([200,201,202])\r",
+											"});\r",
+											"\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"\r",
+											"pm.test(\"Test data type of the response\",() => {\r",
+											"    pm.expect(jsonData).to.be.an(\"object\");\r",
+											"    });\r",
+											"\r",
+											"pm.test(\"email matches include \\\"user@test.com\\\". Fact: \" + jsonData.user.email, function () {\r",
+											"    pm.expect(pm.response.text(jsonData.user.email)).to.include(\"user@test.com\");\r",
+											"}); \r",
+											"\r",
+											"pm.test(\"Id is not null. Id is:  \" + jsonData.user.id, function () {\r",
+											"    pm.expect(pm.response.text(jsonData.user.id)).to.be.not.null\r",
+											"});\r",
+											"\r",
+											"pm.test(\"FirstName matches \\\"Ваня\\\". Fact: \" + jsonData.user.firstName, function () {\r",
+											"    pm.expect(pm.response.text(jsonData.user.firstName)).to.include(\"Ваня\");\r",
+											"    pm.expect(jsonData.user.firstName).to.be.not.null;\r",
+											"});\r",
+											"pm.test(\"lastName matches \\\"Иванов\\\". Fact:  \" + jsonData.user.lastName, function () {\r",
+											"    pm.expect(pm.response.text(jsonData.user.lastName)).to.include(\"Иванов\");\r",
+											"    pm.expect(jsonData.user.lastName).to.be.not.null;\r",
+											"});\r",
+											"pm.test(\"middleName matches \\\"Иванович\\\". Fact:  \" + jsonData.user.middleName, function () {\r",
+											"    pm.expect(pm.response.text(jsonData.user.middleName)).to.include(\"Иванович\");\r",
+											"    pm.expect(jsonData.user.middleName).to.be.not.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"testResult is true\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.user.isVerified).to.eql(true);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Role is \\\"ROLE_STUDENT\\\". Fact: \" + jsonData.user.role, () => {\r",
+											"    pm.expect(jsonData.user.role).to.be.oneOf([\"ROLE_DOCTOR\",\"ROLE_STUDENT\",\"...\",\"ROLE_PATIENT\"])\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Country matches \\\"Российская Федерация\\\". Fact: \" + jsonData.user.country, function () {\r",
+											"    pm.expect(jsonData.user.country).to.include(\"Российская Федерация\")\r",
+											"    pm.expect(jsonData.user.country).to.be.not.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"State matches \\\"Архангельская область\\\". Fact: \" + jsonData.user.region, function () {\r",
+											"    pm.expect(jsonData.user.region).to.include(\"Архангельская область\")\r",
+											"    pm.expect(jsonData.user.region).to.be.not.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"City matches \\\"Северодвинск\\\". Fact: \" + jsonData.user.city, function () {\r",
+											"    pm.expect(jsonData.user.city).to.include(\"Северодвинск\")\r",
+											"    pm.expect(jsonData.user.city).to.be.not.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"University is not null. + Fact: \" + jsonData.user.university, function () {\r",
+											"    pm.expect(jsonData.user.university).to.be.not.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"FinishDate is 2023. Fact: \" + jsonData.user.finishDate, function () {\r",
+											"    pm.expect(jsonData.user.finishDate).to.be.a(\"number\");\r",
+											"    pm.expect(jsonData.user.finishDate).to.eql(2023)\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Referer",
+										"value": "https://test.mirvracha.ru/auth/continueRegistration/student",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{gen_email}}\",\r\n    \"role\": \"4\",\r\n    \"testResult\": \"true\",\r\n    \"diplomaId\": \"\",\r\n    \"lastName\": \"{{lastName}}\",\r\n    \"firstName\": \"{{firstName}}\",\r\n    \"middleName\": \"{{middleName}}\",\r\n    \"country\": \"Российская Федерация\",\r\n    \"region\": \"Архангельская область\",\r\n    \"city\": \"Северодвинск\",\r\n    \"university\": \"Астраханская гос. мед. академия\",\r\n    \"finishDate\": \"2023\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{mir_url}}/completeRegistration",
+									"host": [
+										"{{mir_url}}"
+									],
+									"path": [
+										"completeRegistration"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "PreRegTestFalse",
+					"item": [
+						{
+							"name": "auth/contReg1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Confirmed email was successful. Code is: \" + pm.response.code, function () {\r",
+											"pm.expect(pm.response.code).to.be.oneOf([200,201,202])\r",
+											"});\r",
+											"\r",
+											" const jsonData = pm.response.json();\r",
+											"\r",
+											"\r",
+											"pm.test(\"Generate new email\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.environment.set(\"gen_email\", jsonData.user.email);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"email matches \" + jsonData.user.email, function () {\r",
+											"    pm.expect(pm.response.text(jsonData.user.email)).to.include(\"user@test.com\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Email is not null \" + jsonData.user.email, function () {\r",
+											"    pm.expect(jsonData.user.email).to.be.not.null;\r",
+											"})\r",
+											"\r",
+											"pm.test(\"Id matches \" + jsonData.user.role.id, function () {\r",
+											"    pm.expect(jsonData.user.role.id).to.eql(2);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let random = +new Date();\r",
+											"\r",
+											"pm.globals.set(\"email\", `${random}-user@test.com`);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"roleId\": \"4\",\r\n    \"url\": \"patient\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{mir_url}}/continueRegistration",
+									"host": [
+										"{{mir_url}}"
+									],
+									"path": [
+										"continueRegistration"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "RegWithFalseTest",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"User creation was successful. Code is: \" + pm.response.code, function () {\r",
+											"pm.expect(pm.response.code).to.be.oneOf([200,201,202])\r",
+											"});\r",
+											"\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"\r",
+											"pm.test(\"Test data type of the response\",() => {\r",
+											"    pm.expect(jsonData).to.be.an(\"object\");\r",
+											"    });\r",
+											"\r",
+											"pm.test(\"email matches include \\\"user@test.com\\\". Fact: \" + jsonData.user.email, function () {\r",
+											"    pm.expect(pm.response.text(jsonData.user.email)).to.include(\"user@test.com\");\r",
+											"}); \r",
+											"\r",
+											"pm.test(\"Id is not null. Id is:  \" + jsonData.user.id, function () {\r",
+											"    pm.expect(pm.response.text(jsonData.user.id)).to.be.not.null\r",
+											"});\r",
+											"\r",
+											"pm.test(\"FirstName matches \\\"Ваня\\\". Fact: \" + jsonData.user.firstName, function () {\r",
+											"    pm.expect(pm.response.text(jsonData.user.firstName)).to.include(\"Ваня\");\r",
+											"    pm.expect(jsonData.user.firstName).to.be.not.null;\r",
+											"});\r",
+											"pm.test(\"lastName matches \\\"Иванов\\\". Fact:  \" + jsonData.user.lastName, function () {\r",
+											"    pm.expect(pm.response.text(jsonData.user.lastName)).to.include(\"Иванов\");\r",
+											"    pm.expect(jsonData.user.lastName).to.be.not.null;\r",
+											"});\r",
+											"pm.test(\"middleName matches \\\"Иванович\\\". Fact:  \" + jsonData.user.middleName, function () {\r",
+											"    pm.expect(pm.response.text(jsonData.user.middleName)).to.include(\"Иванович\");\r",
+											"    pm.expect(jsonData.user.middleName).to.be.not.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"testResult is true\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.user.isVerified).to.eql(true);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Role is \\\"ROLE_STUDENT\\\". Fact: \" + jsonData.user.role, () => {\r",
+											"    pm.expect(jsonData.user.role).to.be.oneOf([\"ROLE_DOCTOR\",\"ROLE_STUDENT\",\"...\",\"ROLE_PATIENT\"])\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Country matches \\\"Российская Федерация\\\". Fact: \" + jsonData.user.country, function () {\r",
+											"    pm.expect(jsonData.user.country).to.include(\"Российская Федерация\")\r",
+											"    pm.expect(jsonData.user.country).to.be.not.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"State matches \\\"Архангельская область\\\". Fact: \" + jsonData.user.region, function () {\r",
+											"    pm.expect(jsonData.user.region).to.include(\"Архангельская область\")\r",
+											"    pm.expect(jsonData.user.region).to.be.not.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"City matches \\\"Северодвинск\\\". Fact: \" + jsonData.user.city, function () {\r",
+											"    pm.expect(jsonData.user.city).to.include(\"Северодвинск\")\r",
+											"    pm.expect(jsonData.user.city).to.be.not.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"University is not null. + Fact: \" + jsonData.user.university, function () {\r",
+											"    pm.expect(jsonData.user.university).to.be.not.null;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"FinishDate is 2023. Fact: \" + jsonData.user.finishDate, function () {\r",
+											"    pm.expect(jsonData.user.finishDate).to.be.a(\"number\");\r",
+											"    pm.expect(jsonData.user.finishDate).to.eql(2023)\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let random = +new Date();\r",
+											"\r",
+											"pm.globals.set(\"lastName\", `${random}-Иванов`);\r",
+											"pm.globals.set(\"firstName\", `${random}-Ваня`);\r",
+											"pm.globals.set(\"middleName\", `${random}-Иванович`);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{gen_email}}\",\r\n    \"role\": \"4\",\r\n    \"testResult\": \"false\",\r\n    \"diplomaId\": \"123\",\r\n    \"lastName\": \"{{lastName}}\",\r\n    \"firstName\": \"{{firstName}}\",\r\n    \"middleName\": \"{{middleName}}\",\r\n    \"country\": \"Российская Федерация\",\r\n    \"region\": \"Архангельская область\",\r\n    \"city\": \"Северодвинск\",\r\n    \"university\": \"Астраханская гос. мед. академия\",\r\n    \"finishDate\": \"2023\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{mir_url}}/completeRegistration",
+									"host": [
+										"{{mir_url}}"
+									],
+									"path": [
+										"completeRegistration"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}

@@ -55,6 +55,7 @@ print(country_field_text)
 if country_field_text == "Российская Федерация":
     print("Отлично, меньше действий")
 else:
+    country_field = find_e(By.XPATH,"//div[@class =\"reg-info\"]/div[1]/div[1]//div[@class=\" css-1uccc91-singleValue\"]")
     country_field.click()
     time.sleep(1)
     country_field_input = find_e(By.ID, "react-select-5-input")
