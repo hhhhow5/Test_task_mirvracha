@@ -299,7 +299,7 @@
 											"const jsonData = pm.response.json();\r",
 											"\r",
 											"\r",
-											"pm.test(\"Test data type of the response\",() => {\r",
+											"pm.test(\"Test data typee of the response\",() => {\r",
 											"    pm.expect(jsonData).to.be.an(\"object\");\r",
 											"    });\r",
 											"\r",
